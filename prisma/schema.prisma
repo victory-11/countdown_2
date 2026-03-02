@@ -1,0 +1,38 @@
+// Prisma schema for Neon PostgreSQL
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+}
+
+model SyncGroup {
+  id        String      @id @default(cuid())
+  code      String      @unique
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  countdowns Countdown[]
+}
+
+model Countdown {
+  id          String     @id @default(cuid())
+  title       String
+  targetDate  DateTime
+  description String?
+  color       String
+  icon        String?
+  notify      Boolean    @default(true)
+  completed   Boolean    @default(false)
+  soundId     String?
+  loopSound   Boolean    @default(false)
+  volume      Float      @default(1.0)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  syncGroupId String
+  syncGroup   SyncGroup  @relation(fields: [syncGroupId], references: [id], onDelete: Cascade)
+
+  @@index([syncGroupId])
+}
